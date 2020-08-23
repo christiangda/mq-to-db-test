@@ -23,6 +23,7 @@ var (
 
 	message            string
 	messageContentType string
+	messageNumber      int
 )
 
 func main() {
@@ -38,8 +39,9 @@ func main() {
 	flag.BoolVar(&exchangeDurable, "exchangeDurable", true, "RabbitMQ exchange durability")
 	flag.BoolVar(&exchangeAutoDelete, "exchangeAutoDelete", false, "RabbitMQ exchange auto-delete")
 
-	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"localhost","DB":"postgresql","USER":"postgres","PASS":"mysecretpassword","SENTENCE":"SELECT pg_sleep(1.5);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
+	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"localhost","DB":"postgresql","USER":"postgres","PASS":"mysecretpassword","SENTENCE":"SELECT pg_sleep(1);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
 	flag.StringVar(&messageContentType, "messageContentType", "application/json", "Message to send into the queue")
+	flag.IntVar(&messageNumber, "messageNumber", 100, "Number of messages to be send")
 
 	flag.Parse()
 
@@ -83,7 +85,7 @@ func main() {
 	}
 
 	// Publishing
-	log.Printf("Publishing message: %s, into the exchange: %s", message, exchange)
+	log.Printf("Publishing %d message: %s, into the exchange: %s", messageNumber, message, exchange)
 	msgConf := amqp.Publishing{}
 	msgConf.ContentType = messageContentType
 	msgConf.Body = []byte(message)
@@ -91,14 +93,16 @@ func main() {
 		msgConf.DeliveryMode = amqp.Persistent
 	}
 
-	if err := ch.Publish(
-		exchange,
-		exchangeRoutingKey,
-		false, // mandatory
-		false, // immediate
-		msgConf,
-	); err != nil {
-		log.Fatalf("Failed to publish a message on RabbitMQ exchange: %s", err)
+	for i := 0; i < messageNumber; i++ {
+		if err := ch.Publish(
+			exchange,
+			exchangeRoutingKey,
+			false, // mandatory
+			false, // immediate
+			msgConf,
+		); err != nil {
+			log.Fatalf("Failed to publish a message on RabbitMQ exchange: %s", err)
+		}
 	}
 
 	log.Println("Message sent...")
