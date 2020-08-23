@@ -25,3 +25,23 @@ Queue consumer
 ```bash
 go run cmd/consumer/consumer.go --help
 ```
+
+## Message
+
+```json
+{
+    "TYPE":"SQL",
+    "CONTENT":{
+        "SERVER":"localhost",
+         "DB":"postgresql",
+         "USER":"postgres",
+         "PASS":"mysecretpassword",
+         "SENTENCE":"SELECT pg_sleep(1.5);"
+    },
+    "DATE":"2020-01-01 00:00:01.000000-1",
+    "APPID":"test",
+    "ADITIONAL":null,
+    "ACK": false,
+    "RESPONSE":null
+}
+```

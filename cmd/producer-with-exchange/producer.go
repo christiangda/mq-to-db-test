@@ -31,14 +31,14 @@ func main() {
 	flag.StringVar(&username, "username", "guest", "RabbitMQ username")
 	flag.StringVar(&password, "password", "guest", "RabbitMQ password")
 
-	flag.StringVar(&virtualHost, "virtualHost", "my.virtualhost", "RabbitMQ virtualHost")
+	flag.StringVar(&virtualHost, "virtualHost", "", "RabbitMQ virtualHost")
 	flag.StringVar(&exchange, "exchange", "my.exchage", "RabbitMQ exchange")
 	flag.StringVar(&exchangeRoutingKey, "exchangeRoutingKey", "my.routeKey", "RabbitMQ exchange routing key")
 	flag.StringVar(&exchangeType, "exchangeType", "topic", "RabbitMQ exchange type")
 	flag.BoolVar(&exchangeDurable, "exchangeDurable", true, "RabbitMQ exchange durability")
 	flag.BoolVar(&exchangeAutoDelete, "exchangeAutoDelete", false, "RabbitMQ exchange auto-delete")
 
-	flag.StringVar(&message, "message", "Hello Fucked World!", "Message to send into the queue")
+	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"localhost","DB":"postgresql","USER":"postgres","PASS":"mysecretpassword","SENTENCE":"SELECT pg_sleep(1.5);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
 	flag.StringVar(&messageContentType, "messageContentType", "application/json", "Message to send into the queue")
 
 	flag.Parse()
