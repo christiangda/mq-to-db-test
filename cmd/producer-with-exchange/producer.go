@@ -45,6 +45,9 @@ func main() {
 
 	flag.Parse()
 
+	// concurrency := runtime.GOMAXPROCS(0)
+	// log.Printf("Maximun concurrency: %d", concurrency)
+
 	// Connecting
 	uri := fmt.Sprintf("amqp://%s:%s@%s:%d/", username, password, serverAddress, serverPort)
 
