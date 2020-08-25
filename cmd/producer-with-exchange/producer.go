@@ -108,5 +108,5 @@ func main() {
 		}
 	}
 
-	log.Println("Message sent...")
+	log.Println("Message send...")
 }
