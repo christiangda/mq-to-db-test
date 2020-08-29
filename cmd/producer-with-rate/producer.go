@@ -134,11 +134,11 @@ func main() {
 	}()
 
 	// Block the main function here until we receive OS signals
-	log.Info("Press ctr^c to cancel the producer")
+	log.Info("Press ctr^c to stop the producer")
 	<-osSignal
 
 	cancel()
-	log.Println("Messages send...")
+	log.Println("Producer cancelled...")
 }
 
 // ListenOSSignals is a functions that
