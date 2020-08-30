@@ -45,9 +45,9 @@ func main() {
 	flag.BoolVar(&exchangeDurable, "exchangeDurable", true, "RabbitMQ exchange durability")
 	flag.BoolVar(&exchangeAutoDelete, "exchangeAutoDelete", false, "RabbitMQ exchange auto-delete")
 
-	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"localhost","DB":"postgresql","USER":"postgres","PASS":"mysecretpassword","SENTENCE":"SELECT pg_sleep(1);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
+	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"","DB":"","USER":"","PASS":"","SENTENCE":"SELECT pg_sleep(1);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
 	flag.StringVar(&messageContentType, "messageContentType", "application/json", "Message to send into the queue")
-	flag.IntVar(&messageRate, "messageRate", 50, "Number of messages to be send per seconds (m/s)")
+	flag.IntVar(&messageRate, "messageRate", 1, "Number of messages to be send per seconds (m/s)")
 
 	flag.Parse()
 
