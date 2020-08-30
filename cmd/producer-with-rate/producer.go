@@ -39,7 +39,7 @@ func main() {
 	flag.StringVar(&password, "password", "guest", "RabbitMQ password")
 
 	flag.StringVar(&virtualHost, "virtualHost", "", "RabbitMQ virtualHost")
-	flag.StringVar(&exchange, "exchange", "my.exchage", "RabbitMQ exchange")
+	flag.StringVar(&exchange, "exchange", "my.exchange", "RabbitMQ exchange")
 	flag.StringVar(&exchangeRoutingKey, "exchangeRoutingKey", "my.routeKey", "RabbitMQ exchange routing key")
 	flag.StringVar(&exchangeType, "exchangeType", "topic", "RabbitMQ exchange type")
 	flag.BoolVar(&exchangeDurable, "exchangeDurable", true, "RabbitMQ exchange durability")
