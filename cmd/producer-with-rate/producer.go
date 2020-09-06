@@ -4,8 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -26,13 +28,20 @@ var (
 	exchangeType       string
 	exchangeDurable    bool
 	exchangeAutoDelete bool
+	debug              bool
 
 	message            string
 	messageContentType string
 	messageRate        int
+	messageRandom      bool
+
+	messageValue = `{"TYPE":"SQL","CONTENT":{"SERVER":"","DB":"","USER":"","PASS":"","SENTENCE":"SELECT pg_sleep(%.1f);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`
 )
 
 func main() {
+
+	messageValueDefault := fmt.Sprintf(messageValue, 1.0)
+
 	flag.StringVar(&serverAddress, "server-address", "127.0.0.1", "RabbitMQ server IP address")
 	flag.IntVar(&serverPort, "server-port", 5672, "RabbitMQ server port")
 	flag.StringVar(&username, "username", "guest", "RabbitMQ username")
@@ -45,11 +54,17 @@ func main() {
 	flag.BoolVar(&exchangeDurable, "exchangeDurable", true, "RabbitMQ exchange durability")
 	flag.BoolVar(&exchangeAutoDelete, "exchangeAutoDelete", false, "RabbitMQ exchange auto-delete")
 
-	flag.StringVar(&message, "message", `{"TYPE":"SQL","CONTENT":{"SERVER":"","DB":"","USER":"","PASS":"","SENTENCE":"SELECT pg_sleep(1);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`, "Message to send into the queue")
+	flag.StringVar(&message, "message", messageValueDefault, "Message to send into the queue")
 	flag.StringVar(&messageContentType, "messageContentType", "application/json", "Message to send into the queue")
 	flag.IntVar(&messageRate, "messageRate", 1, "Number of messages to be send per seconds (m/s)")
+	flag.BoolVar(&messageRandom, "messageRandom", false, "Randomize the time inside pg_sleep(<t random>)")
+	flag.BoolVar(&debug, "debug", false, "Enable debug messages")
 
 	flag.Parse()
+
+	if debug {
+		log.SetLevel(log.DebugLevel)
+	}
 
 	// concurrency := runtime.GOMAXPROCS(0)
 	// log.Printf("Maximun concurrency: %d", concurrency)
@@ -98,23 +113,33 @@ func main() {
 		log.Fatalf("Failed to Declare RabbitMQ Exchange: %s", err)
 	}
 
-	// Publishing
-	log.Printf("Publishing %d/s message: %s, into the exchange: %s", messageRate, message, exchange)
-	msgConf := amqp.Publishing{}
-	msgConf.ContentType = messageContentType
-	msgConf.Body = []byte(message)
-	if exchangeDurable {
-		msgConf.DeliveryMode = amqp.Persistent
-	}
-
+	var wg sync.WaitGroup
+	wg.Add(1)
 	go func() {
 		for {
 			select {
 			case <-time.Tick(time.Second * 1):
 
 				for i := 1; i <= messageRate; i++ {
+					wg.Add(1)
+					go func(m string) {
+						defer wg.Done()
 
-					go func() {
+						if messageRandom && (messageValueDefault == m) {
+							// 0.1 <= dt < 11.0
+							dt := (rand.Float64() * 11) + 0.1
+							m = fmt.Sprintf(messageValue, dt)
+						}
+
+						msgConf := amqp.Publishing{}
+						msgConf.Body = []byte(m)
+						msgConf.ContentType = messageContentType
+						if exchangeDurable {
+							msgConf.DeliveryMode = amqp.Persistent
+						}
+
+						log.Debugf("Publishing %d/s message: %s, into the exchange: %s", messageRate, m, exchange)
+
 						if err := ch.Publish(
 							exchange,
 							exchangeRoutingKey,
@@ -124,12 +149,14 @@ func main() {
 						); err != nil {
 							log.Fatalf("Failed to publish a message on RabbitMQ exchange: %s", err)
 						}
-					}()
+					}(message)
 				}
 
 			case <-ctx.Done():
+				wg.Done()
 				return
 			}
+
 		}
 	}()
 

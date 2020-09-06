@@ -24,6 +24,10 @@ Queue Producer with Exchange to send a defined number of messages per seconds
 go run cmd/producer-with-rate/producer.go --help
 ```
 
+```bash
+go run cmd/producer-with-rate/producer.go -messageRandom -messageRate 10
+```
+
 ### Consumers
 
 Queue consumer
@@ -42,7 +46,7 @@ go run cmd/consumer/consumer.go --help
          "DB":"",
          "USER":"",
          "PASS":"",
-         "SENTENCE":"SELECT pg_sleep(1.5);"
+         "SENTENCE":"SELECT pg_sleep(1.0);"
     },
     "DATE":"2020-01-01 00:00:01.000000-1",
     "APPID":"test",
