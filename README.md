@@ -25,7 +25,15 @@ go run cmd/producer-with-rate/producer.go --help
 ```
 
 ```bash
-go run cmd/producer-with-rate/producer.go -messageRandom -messageRate 10
+go run cmd/producer-with-rate/producer.go -timeRandom -messageRate 10
+```
+
+```bash
+go run ./cmd/producer-with-rate/producer.go -messageRate 1 -timeRandom --debug
+```
+
+```bash
+go run ./cmd/producer-with-rate/producer.go -messageRate 1 -timeRandom -timeRandomMin 1 -timeRandomMax 11
 ```
 
 ### Consumers

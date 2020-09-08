@@ -33,7 +33,9 @@ var (
 	message            string
 	messageContentType string
 	messageRate        int
-	messageRandom      bool
+	timeRandom         bool
+	timeRandomMin      float64
+	timeRandomMax      float64
 
 	messageValue = `{"TYPE":"SQL","CONTENT":{"SERVER":"","DB":"","USER":"","PASS":"","SENTENCE":"SELECT pg_sleep(%.1f);"},"DATE":"2020-01-01 00:00:01.000000-1","APPID":"test","ADITIONAL":null,"ACK": false,"RESPONSE":null}`
 )
@@ -57,7 +59,11 @@ func main() {
 	flag.StringVar(&message, "message", messageValueDefault, "Message to send into the queue")
 	flag.StringVar(&messageContentType, "messageContentType", "application/json", "Message to send into the queue")
 	flag.IntVar(&messageRate, "messageRate", 1, "Number of messages to be send per seconds (m/s)")
-	flag.BoolVar(&messageRandom, "messageRandom", false, "Randomize the time inside pg_sleep(<t random>)")
+
+	flag.BoolVar(&timeRandom, "timeRandom", false, "Randomize the time inside pg_sleep(<t random>)")
+	flag.Float64Var(&timeRandomMin, "timeRandomMin", 0.1, "The min value for the time inside pg_sleep(<t random>)")
+	flag.Float64Var(&timeRandomMax, "timeRandomMax", 11.0, "The max value for the time inside pg_sleep(<t random>)")
+
 	flag.BoolVar(&debug, "debug", false, "Enable debug messages")
 
 	flag.Parse()
@@ -125,9 +131,9 @@ func main() {
 					go func(m string) {
 						defer wg.Done()
 
-						if messageRandom && (messageValueDefault == m) {
+						if timeRandom && (messageValueDefault == m) {
 							// 0.1 <= dt < 11.0
-							dt := (rand.Float64() * 11) + 0.1
+							dt := timeRandomMin + rand.Float64()*(timeRandomMax-timeRandomMin)
 							m = fmt.Sprintf(messageValue, dt)
 						}
 
