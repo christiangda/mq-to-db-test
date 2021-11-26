@@ -41,6 +41,7 @@ var (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 
 	messageValueDefault := fmt.Sprintf(messageValue, 1.0)
 
@@ -162,7 +163,6 @@ func main() {
 				wg.Done()
 				return
 			}
-
 		}
 	}()
 
