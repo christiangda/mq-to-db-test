@@ -1,9 +1,10 @@
 module gihub.com/christiangda/test-mq
 
-go 1.16
+go 1.23
 
 require (
-	github.com/sirupsen/logrus v1.8.1
-	github.com/streadway/amqp v1.0.0
-	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
+	github.com/sirupsen/logrus v1.9.3
+	github.com/streadway/amqp v1.1.0
 )
+
+require golang.org/x/sys v0.24.0 // indirect
